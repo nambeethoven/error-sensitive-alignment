@@ -63,4 +63,5 @@ lake env lean ../AxiomCheck.lean # every declaration: propext, Classical.choice,
 
 ## License
 
-Apache-2.0 (see `LICENSE`).
+Code: Apache-2.0 (see `LICENSE`). The paper in `paper/` is also released under CC BY 4.0
+(the license of the Zenodo record).
