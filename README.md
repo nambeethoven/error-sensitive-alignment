@@ -3,7 +3,11 @@
 Nam Khanh Ngo · Independent Researcher, Beethoven Capital (independent research initiative) ·
 ORCID [0009-0003-6013-7308](https://orcid.org/0009-0003-6013-7308)
 
-Paper: [`paper/e2_note.pdf`](paper/e2_note.pdf).
+Paper: [`paper/e2_note.pdf`](paper/e2_note.pdf) · Version 1.0 (3 November 2026) · DOI
+[10.5281/zenodo.23920280](https://doi.org/10.5281/zenodo.23920280)
+
+Cite: Nam Khanh Ngo, *Error-Sensitive Alignment Bounds for Affine-Line Decoding: A Lean-Verified
+Refinement*, preprint (not peer reviewed), v1.0, 2026, doi:10.5281/zenodo.23920280.
 
 ## Result
 
@@ -31,7 +35,9 @@ The existing ArkLib theorems keep their statements; `IsLineDecodable.mcaError_le
 
 ## Reproduce
 
-Base: ArkLib `2203b01cede353c4cb8e6524416dbf106e2c5cfb`, Lean `v4.35.0`.
+Base: ArkLib `2203b01cede353c4cb8e6524416dbf106e2c5cfb`, Lean `v4.35.0`. The Lean sources and
+patch are those checked by this repository's CI at commit `e1cdaba6a1400424ccd17bfb782332511a8de3f1`
+(unchanged since; later commits touch only documentation).
 
 ```sh
 git clone https://github.com/Verified-zkEVM/ArkLib.git && cd ArkLib

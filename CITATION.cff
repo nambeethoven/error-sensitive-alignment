@@ -8,9 +8,10 @@ authors:
     affiliation: "Beethoven Capital (independent research initiative)"
     orcid: "https://orcid.org/0009-0003-6013-7308"
 version: "1.0.0"
-date-released: "YYYY-MM-DD"  # set at release
+date-released: "2026-11-03"
+doi: "10.5281/zenodo.23920280"
 license: Apache-2.0
-repository-code: "https://github.com/OWNER/REPO"  # set at release
+repository-code: "https://github.com/nambeethoven/error-sensitive-alignment"
 abstract: >-
   Lean 4 formalization, on top of ArkLib, of an error-sensitive threshold for deriving
   affine-line mutual correlated agreement from line decodability: max(floor(delta n) + 2, 3)
