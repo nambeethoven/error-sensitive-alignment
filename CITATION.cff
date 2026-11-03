@@ -40,6 +40,6 @@ references:
   - type: software
     title: "Proximity Prize submission 016274d1-9b09-4ce1-add3-4c632dbbc283 (68.15 bits)"
     authors:
-      - name: "BitWonka (leaderboard name)"
+      - name: "Proximity Prize submission 016274d1-9b09-4ce1-add3-4c632dbbc283"
     url: "https://github.com/proximity-prize/proximity-prize"
     notes: "Counting lemma exists_common_affine_set, Apache-2.0"

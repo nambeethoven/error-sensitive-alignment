@@ -48,11 +48,12 @@ lake env lean ../AxiomCheck.lean # every declaration: propext, Classical.choice,
 - The four files under `ArkLib/` are modified copies of ArkLib files (Apache-2.0, © ArkLib
   Contributors). Changes are listed in `e2.patch`.
 - The counting lemma follows `exists_common_affine_set` of Proximity Prize submission
-  `016274d1-9b09-4ce1-add3-4c632dbbc283` (68.15 bits, listed under BitWonka on the leaderboard),
+  `016274d1-9b09-4ce1-add3-4c632dbbc283` (68.15 bits; the commit proves `ProtocolClaim 6815`),
   `ProximityPrize/SubmissionLower` in github.com/proximity-prize/proximity-prize, Apache-2.0.
 - AI assistance: Claude (Anthropic) wrote most of the Lean code and numerical checks; ChatGPT
-  (OpenAI) reviewed statements and literature. The author is responsible for the content; the
-  Lean kernel checks every proof.
+  (OpenAI) reviewed statements and literature. The author takes responsibility for the content and
+  presentation; the formalized theorems are checked by the Lean kernel, while the exposition and
+  formalization were developed with AI assistance.
 
 ## License
 

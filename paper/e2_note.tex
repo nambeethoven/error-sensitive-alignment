@@ -71,8 +71,8 @@ $n<q$ (Theorem~\ref{thm:mca}).
 (Corollary~\ref{cor:frs}).
 \end{itemize}
 The counting lemma itself is not new: the same argument appears as
-\lean{exists\_common\_affine\_set} in the 68.15-bit Proximity Prize submission (author handle
-BitWonka, Apache-2.0)~\cite{BW}, where it serves an alignment bound for Reed--Solomon codes. We
+\lean{exists\_common\_affine\_set} in the 68.15-bit Proximity Prize submission
+\texttt{016274d1-9b09-4ce1-add3-4c632dbbc283} (Apache-2.0)~\cite{BW}, where it serves an alignment bound for Reed--Solomon codes. We
 did not find the error-dependent threshold for line decoding, or the resulting FRS bound, in
 \cite{GG25,LCD26,AGG26}; the argument is elementary and may be known.
 
@@ -241,11 +241,12 @@ curves the counting argument gives $|E|\le\ell(e+1)$, since a mismatch coordinat
 most $\ell$ challenges; we checked this numerically for small cases but did not formalize it.
 
 \section*{Acknowledgements and use of AI tools}
-The counting lemma follows \lean{exists\_common\_affine\_set} of the Proximity Prize submission by
-BitWonka. The formalization builds on ArkLib and its contributors. Claude (Anthropic) wrote most
+The counting lemma follows \lean{exists\_common\_affine\_set} of Proximity Prize submission
+\texttt{016274d1-9b09-4ce1-add3-4c632dbbc283}~\cite{BW}. The formalization builds on ArkLib and its contributors. Claude (Anthropic) wrote most
 of the Lean code and the numerical checks; ChatGPT (OpenAI) reviewed the statements, quantifier
-structure and literature comparison. The author checked every statement and is responsible for
-the content; the Lean kernel checks every proof.
+structure and literature comparison. The author takes responsibility for the content and
+presentation of this note. The formalized theorems have been checked by the Lean kernel, while the
+exposition and formalization were developed with AI assistance as disclosed above.
 
 \begin{thebibliography}{9}
 \bibitem{GG25} R.~Goyal and V.~Guruswami. Optimal proximity gaps for subspace-design codes and
@@ -257,7 +258,7 @@ improved proximity gaps. arXiv:2607.08516, 2026; APPROX/RANDOM 2026, LIPIcs vol.
 \bibitem{JLR26} F.~G.~Jeronimo, L.~Liu and P.~Rajpal. Optimal proximity gap for folded
 Reed--Solomon codes via subspace designs. arXiv:2601.10047, 2026.
 \bibitem{BW} Proximity Prize submission \texttt{016274d1-9b09-4ce1-add3-4c632dbbc283}
-(68.15 bits; listed under BitWonka on the leaderboard), \texttt{ProximityPrize/SubmissionLower} in
+(68.15 bits), \texttt{ProximityPrize/SubmissionLower} in
 \url{https://github.com/proximity-prize/proximity-prize}, commit \texttt{eb82d3b}, Apache-2.0.
 \bibitem{ArkLib} ArkLib contributors. ArkLib: a library for formally verified arguments of
 knowledge. \url{https://github.com/Verified-zkEVM/ArkLib}.
