@@ -7,9 +7,9 @@ authors:
     given-names: Nam Khanh
     affiliation: "Beethoven Capital (independent research initiative)"
     orcid: "https://orcid.org/0009-0003-6013-7308"
-version: "1.0.0"
+version: "1.0.1"
 date-released: "2026-11-03"
-doi: "10.5281/zenodo.23920280"
+doi: "10.5281/zenodo.23930694"
 license: Apache-2.0
 repository-code: "https://github.com/nambeethoven/error-sensitive-alignment"
 abstract: >-
@@ -44,3 +44,31 @@ references:
       - name: "Proximity Prize submission 016274d1-9b09-4ce1-add3-4c632dbbc283"
     url: "https://github.com/proximity-prize/proximity-prize"
     notes: "Counting lemma exists_common_affine_set, Apache-2.0"
+  - type: conference-paper
+    title: "Ligero: Lightweight Sublinear Arguments Without a Trusted Setup"
+    authors:
+      - family-names: Ames
+        given-names: Scott
+      - family-names: Hazay
+        given-names: Carmit
+      - family-names: Ishai
+        given-names: Yuval
+      - family-names: Venkitasubramaniam
+        given-names: Muthuramakrishnan
+    notes: "CCS 2017"
+  - type: conference-paper
+    title: "Worst-Case to Average Case Reductions for the Distance to a Code"
+    authors:
+      - family-names: Ben-Sasson
+        given-names: Eli
+      - family-names: Kopparty
+        given-names: Swastik
+      - family-names: Saraf
+        given-names: Shubhangi
+    notes: "CCC 2018"
+  - type: article
+    title: "A Note on Mutual Correlated Agreement for Reed-Solomon Codes"
+    authors:
+      - family-names: Haböck
+        given-names: Ulrich
+    notes: "IACR ePrint 2025/2110, Lemma 1"

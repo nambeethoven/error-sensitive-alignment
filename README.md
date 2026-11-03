@@ -3,11 +3,12 @@
 Nam Khanh Ngo · Independent Researcher, Beethoven Capital (independent research initiative) ·
 ORCID [0009-0003-6013-7308](https://orcid.org/0009-0003-6013-7308)
 
-Paper: [`paper/e2_note.pdf`](paper/e2_note.pdf) · Version 1.0 (3 November 2026) · DOI
-[10.5281/zenodo.23920280](https://doi.org/10.5281/zenodo.23920280)
+Paper: [`paper/e2_note.pdf`](paper/e2_note.pdf) · Version 1.0.1 (3 November 2026) · DOI
+[10.5281/zenodo.23930694](https://doi.org/10.5281/zenodo.23930694) (v1.0.0:
+[10.5281/zenodo.23920280](https://doi.org/10.5281/zenodo.23920280)) · [Changelog](CHANGELOG.md)
 
 Cite: Nam Khanh Ngo, *Error-Sensitive Alignment Bounds for Affine-Line Decoding: A Lean-Verified
-Refinement*, preprint (not peer reviewed), v1.0, 2026, doi:10.5281/zenodo.23920280.
+Refinement*, preprint (not peer reviewed), v1.0.1, 2026, doi:10.5281/zenodo.23930694.
 
 ## Result
 
@@ -53,7 +54,10 @@ lake env lean ../AxiomCheck.lean # every declaration: propext, Classical.choice,
 
 - The four files under `ArkLib/` are modified copies of ArkLib files (Apache-2.0, © ArkLib
   Contributors). Changes are listed in `e2.patch`.
-- The counting lemma follows `exists_common_affine_set` of Proximity Prize submission
+- The counting argument is classical: Ligero (Ames, Hazay, Ishai, Venkitasubramaniam, CCS 2017)
+  and Ben-Sasson, Kopparty and Saraf (CCC 2018); Haböck, IACR ePrint 2025/2110, Lemma 1, states it
+  for correlated agreement. This work applies it in the proof of GG25 Theorem 3.5.
+- The Lean proof of the counting lemma follows `exists_common_affine_set` of Proximity Prize submission
   `016274d1-9b09-4ce1-add3-4c632dbbc283` (68.15 bits; the commit proves `ProtocolClaim 6815`),
   `ProximityPrize/SubmissionLower` in github.com/proximity-prize/proximity-prize, Apache-2.0.
 - AI assistance: Claude (Anthropic) wrote most of the Lean code and numerical checks; ChatGPT
