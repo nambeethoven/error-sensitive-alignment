@@ -1,0 +1,12 @@
+import ArkLib.Data.CodingTheory.ProximityGap.CapacityBounds.Frs
+
+#print axioms CodingTheory.card_le_floor_add_one_of_pencil_mismatch
+#print axioms CodingTheory.IsLineDecodable.mcaError_le_of_floor_add_two
+#print axioms CodingTheory.FrsInternal.strongLineDecodable_boost_of_lambda_le_target
+#print axioms CodingTheory.mcaError_le_of_strongLineDecodable_of_floor_add_two
+#print axioms CodingTheory.frs_mcaError_le_floor_add_two
+#print axioms CodingTheory.frs_mcaError_le
+#print axioms CodingTheory.frs_mcaError_le_min
+#print axioms CodingTheory.IsLineDecodable.mcaError_le
+#print axioms CodingTheory.FrsInternal.strongLineDecodable_boost_of_lambda_le
+#print axioms CodingTheory.mcaError_le_of_strongLineDecodable

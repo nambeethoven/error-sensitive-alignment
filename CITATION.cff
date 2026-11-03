@@ -1,0 +1,45 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Error-Sensitive Alignment Bounds for Affine-Line Decoding: A Lean-Verified Refinement"
+type: software
+authors:
+  - family-names: Ngo
+    given-names: Nam Khanh
+    affiliation: "Beethoven Capital (independent research initiative)"
+    orcid: "https://orcid.org/0009-0003-6013-7308"
+version: "1.0.0"
+date-released: "YYYY-MM-DD"  # set at release
+license: Apache-2.0
+repository-code: "https://github.com/OWNER/REPO"  # set at release
+abstract: >-
+  Lean 4 formalization, on top of ArkLib, of an error-sensitive threshold for deriving
+  affine-line mutual correlated agreement from line decodability: max(floor(delta n) + 2, 3)
+  aligned challenges instead of n + 1, when n < |F|, and the resulting bound
+  ((delta n + 2) t + 3 t^3) / |F| for folded Reed-Solomon codes.
+keywords:
+  - Reed-Solomon codes
+  - proximity gaps
+  - mutual correlated agreement
+  - line decoding
+  - Lean 4
+  - formal verification
+references:
+  - type: article
+    title: "Optimal Proximity Gaps for Subspace-Design Codes and (Random) Reed-Solomon Codes"
+    authors:
+      - family-names: Goyal
+        given-names: Rohan
+      - family-names: Guruswami
+        given-names: Venkatesan
+    notes: "ECCC TR25-166; IACR ePrint 2025/2054"
+  - type: software
+    title: "ArkLib"
+    authors:
+      - name: "ArkLib contributors"
+    url: "https://github.com/Verified-zkEVM/ArkLib"
+  - type: software
+    title: "Proximity Prize submission 016274d1-9b09-4ce1-add3-4c632dbbc283 (68.15 bits)"
+    authors:
+      - name: "BitWonka (leaderboard name)"
+    url: "https://github.com/proximity-prize/proximity-prize"
+    notes: "Counting lemma exists_common_affine_set, Apache-2.0"

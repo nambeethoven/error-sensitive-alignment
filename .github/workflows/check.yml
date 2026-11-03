@@ -1,0 +1,27 @@
+name: check
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
+      - name: Install elan
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: ArkLib at the pinned commit plus this work
+        run: |
+          git clone https://github.com/Verified-zkEVM/ArkLib.git arklib
+          cd arklib && git checkout -q 2203b01cede353c4cb8e6524416dbf106e2c5cfb
+          git apply ../e2.patch
+      - name: Build
+        working-directory: arklib
+        run: |
+          lake exe cache get
+          lake build ArkLib.Data.CodingTheory.ProximityGap.LineDecoding ArkLib.Data.CodingTheory.ProximityGap.CapacityBounds.Frs
+      - name: Axioms
+        working-directory: arklib
+        run: lake env lean ../AxiomCheck.lean

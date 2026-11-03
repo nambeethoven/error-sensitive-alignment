@@ -1,0 +1,266 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\mca}{\varepsilon_{\mathrm{mca}}}
+\newcommand{\lean}[1]{\texttt{\hyphenchar\font=`\_\relax #1}}
+
+\title{Error-Sensitive Alignment Bounds for Affine-Line Decoding:\\ A Lean-Verified Refinement}
+\author{Nam Khanh Ngo\\ Independent Researcher, Beethoven Capital (independent research initiative)\\
+\small ORCID: \href{https://orcid.org/0009-0003-6013-7308}{0009-0003-6013-7308}}
+\date{Draft, November 2026}
+
+\begin{document}
+\sloppy\emergencystretch=3em
+\maketitle
+
+\begin{abstract}
+Goyal and Guruswami derive mutual correlated agreement (MCA) for the affine-line generator from
+line decodability, and ask for $n+1$ aligned challenges, where $n$ is the block length. We show
+that $\max(\lfloor\delta n\rfloor+2,\,3)$ aligned challenges suffice when $n<|\F|$, where $\delta$
+is the proximity parameter. The proof replaces an injection of challenges into coordinates by a
+double count of mismatch coordinates, using that every close challenge misses at most
+$\lfloor\delta n\rfloor$ coordinates. The same change in the boosting step lowers the main term of
+the capacity-regime MCA bound for folded Reed--Solomon codes from $nt$ to $(\delta n+2)t$:
+$\mca(C,\delta)\le((\delta n+2)t+3t^3)/|\F|$ instead of $(nt+3t^3)/|\F|$, with
+$\delta=1-\rho-2/t$. The gain is a constant factor of about $1/\delta$ on the main term. All
+statements are proved in Lean~4 on top of ArkLib, without \texttt{sorry} and with no axioms
+beyond the standard ones.
+\end{abstract}
+
+\section{Introduction}
+
+Proximity gaps and correlated agreement are the soundness engine of FRI-type protocols. Mutual
+correlated agreement (MCA) asks that, for all but few challenges $\gamma$, if $u_0+\gamma u_1$
+agrees with a codeword on a set $S$ of at least $(1-\delta)n$ coordinates, then $u_0$ and $u_1$
+both agree with codewords on the same $S$.
+
+Goyal and Guruswami~\cite{GG25} introduce \emph{line decodability} (Definition~3.1): whenever many
+challenges have a decoded codeword close to the line, a positive fraction of them lie on one
+affine pencil $c_0+\gamma c_1$. Their Theorem~3.5 turns $(\ell,\delta,a,\ell n+1)$ curve
+decodability into MCA error $a/q$; for lines this asks for $n+1$ aligned challenges. Since line
+decodability is usually established for a small number of aligned challenges, it is first boosted
+using a list-size bound (their Theorem~3.6 and Corollary~3.9), and the boost to $n+1$ costs a term
+$nL$, giving error $(nL+a)/q$. The same $n$ appears in the folded Reed--Solomon (FRS)
+bound~\cite[Corollary~4.10]{GG25}, $\mca\le(nt+3t^3)/q$, and in later work~\cite{AGG26}.
+
+\paragraph{Contribution.} The threshold $n+1$ comes from an injection: each aligned challenge
+produces a coordinate where the line agrees with the pencil but $(u_0,u_1)$ does not, and distinct
+challenges produce distinct coordinates. We observe that each such coordinate also lies in the
+agreement set of its challenge, which misses at most $e=\lfloor\delta n\rfloor$ coordinates. A
+double count then bounds the aligned challenges by $e+1$ (Lemma~\ref{lem:count}). Consequences:
+\begin{itemize}
+\item MCA error $a/q$ from $(\delta,a,b)$ line decodability for every $b\ge\max(e+2,3)$, when
+$n<q$ (Theorem~\ref{thm:mca}).
+\item The boost can aim at $e+2$ instead of $n+1$, at cost $(e+1)L$ instead of $nL$
+(Lemma~\ref{lem:boost}).
+\item For FRS codes, $\mca(C,\delta)\le((\delta n+2)t+3t^3)/q$
+(Corollary~\ref{cor:frs}).
+\end{itemize}
+The counting lemma itself is not new: the same argument appears as
+\lean{exists\_common\_affine\_set} in the 68.15-bit Proximity Prize submission (author handle
+BitWonka, Apache-2.0)~\cite{BW}, where it serves an alignment bound for Reed--Solomon codes. We
+did not find the error-dependent threshold for line decoding, or the resulting FRS bound, in
+\cite{GG25,LCD26,AGG26}; the argument is elementary and may be known.
+
+All results are formalized in Lean~4 against ArkLib~\cite{ArkLib} (Section~\ref{sec:lean}).
+
+\section{Setting}
+
+Let $\iota$ be a finite set of $n\ge1$ coordinates, $\F$ a finite field with $q$ elements, $A$ an
+$\F$-module (the alphabet; $A=\F$ for Reed--Solomon codes and $A=\F^s$ for folded codes), and
+$C\subseteq A^\iota$ an $\F$-linear code. Fix $\delta\in[0,1)$ and put $e=\lfloor\delta n\rfloor$.
+A word $x$ is \emph{$\delta$-close} to $y$ if they agree on at least $n-e$ coordinates.
+For $S\subseteq\iota$ write $C|_S$ for the restriction of $C$ to $S$.
+
+\begin{definition}[bad challenge]
+For $u=(u_0,u_1)\in(A^\iota)^2$, a challenge $\gamma\in\F$ is \emph{bad} if there is
+$S\subseteq\iota$ with $|S|\ge(1-\delta)n$ such that $(u_0+\gamma u_1)|_S\in C|_S$ but
+$u_0|_S\notin C|_S$ or $u_1|_S\notin C|_S$. The MCA error $\mca(C,\delta)$ is the maximum over
+$u$ of $\Pr_\gamma[\gamma\text{ bad}]$, with $\gamma$ uniform in $\F$.
+\end{definition}
+
+\begin{definition}[line decodability {\cite[Def.~3.1]{GG25}}]
+$C$ is $(\delta,a,b)$ line decodable if for all $f_0,f_1\in A^\iota$ and all $V:\F\to C$ with
+$\Pr_\gamma[V(\gamma)\ \delta\text{-close to }f_0+\gamma f_1]\ge a/q$ there are $c_0,c_1\in C$ with
+$\Pr_\gamma[V(\gamma)\ \delta\text{-close to }f_0+\gamma f_1\ \text{and}\ V(\gamma)=c_0+\gamma
+c_1]\ge b/q$.
+\end{definition}
+
+\section{The counting lemma}
+
+\begin{lemma}\label{lem:count}
+Let $u_0,u_1,c_0,c_1\in A^\iota$, $E\subseteq\F$ and $e\in\mathbb{N}$. Suppose that for every
+$\gamma\in E$ there is $G_\gamma\subseteq\iota$ with
+\begin{enumerate}
+\item[(A1)] $|G_\gamma|\ge n-e$;
+\item[(A2)] $u_0(i)+\gamma u_1(i)=c_0(i)+\gamma c_1(i)$ for all $i\in G_\gamma$;
+\item[(A3)] some $i\in G_\gamma$ has $(u_0(i),u_1(i))\ne(c_0(i),c_1(i))$.
+\end{enumerate}
+Then $|E|\le e+1$.
+\end{lemma}
+
+\begin{proof}
+Let $M=\{i:(u_0(i),u_1(i))\ne(c_0(i),c_1(i))\}$ and $d_k=u_k-c_k$.
+If $i\in G_\gamma\cap G_\beta\cap M$ with $\gamma\ne\beta$, then by (A2)
+$(\gamma-\beta)\,d_1(i)=0$, so $d_1(i)=0$ and then $d_0(i)=0$, contradicting $i\in M$. Hence the
+sets $M\cap G_\gamma$ are pairwise disjoint, and by (A3) nonempty, so $|M|\ge|E|$.
+Count pairs $(i,\gamma)$ with $i\in M$, $\gamma\in E$, $i\notin G_\gamma$: by (A1) there are at
+most $|E|e$; each $i\in M$ lies in at most one $G_\gamma$, so there are at least
+$|M|(|E|-1)\ge|E|(|E|-1)$. Thus $|E|-1\le e$.
+\end{proof}
+
+Only the field structure (to cancel $\gamma-\beta$) and (A1)--(A3) are used; $c_0,c_1$ need not be
+codewords. The bound is attained whenever $n\ge e+1$ and $q\ge e+1$: take challenges
+$z_1,\dots,z_{e+1}$, coordinates $x_1,\dots,x_{e+1}$, $d_1(x_j)=1$, $d_0(x_j)=-z_j$, $d=0$
+elsewhere, and $G_{z_j}=\iota\setminus\{x_k:k\ne j\}$.
+
+\section{MCA from line decodability}
+
+\begin{theorem}\label{thm:mca}
+Let $\delta<1$, $b\ge\lfloor\delta n\rfloor+2$, $b\ge3$ and $n<q$. If $C$ is $(\delta,a,b)$ line
+decodable, then $\mca(C,\delta)\le a/q$.
+\end{theorem}
+
+\begin{proof}[Proof outline]
+We follow the proof of \cite[Thm.~3.5]{GG25} as formalized in ArkLib and change one step. Fix
+$u$, let $B$ be the set of bad challenges and suppose $|B|>a$. For $\gamma\in B$ fix a witness
+set $S_\gamma$ and codeword $w_\gamma$.
+
+\emph{Nonzero code.} Let $J$ be the set of coordinates where some codeword is nonzero; $|J|\le n<q$
+gives a codeword $d$ nonzero on all of $J$. The set
+$Z=\{i\notin J: u_0(i)=u_1(i)=0\}$ has fewer than $n-e$ elements: otherwise $V(\gamma)=\gamma^2d$
+is close to the line for every $\gamma$, and line decodability would give at least $b\ge3$
+challenges with $\gamma^2d=c_0+\gamma c_1$, which happens for at most two. Define $V(\gamma)=w_\gamma$
+on $B$; off $B$, if every codeword is close to the line, $V(\gamma)=t_\gamma d$ with $t_\gamma$
+chosen so that $V(\gamma)$ differs from the line on all of $J$ (possible since $|J|<q$), and
+otherwise a codeword far from the line. $V$ depends only on $u$ and the chosen witnesses, and
+line decodability holds for every $V$. Since $|B|>a$, it yields $c_0,c_1$ and a set $E$ of at least
+$b$ challenges where $V(\gamma)$ is close to the line and equals $c_0+\gamma c_1$.
+Every $\gamma\in E$ has a coordinate where the line equals the pencil but $u\ne(c_0,c_1)$: for
+$\gamma\in B$ inside $S_\gamma$, by the failure of the witness; for $\gamma\notin B$ in the
+agreement set of $t_\gamma d$ outside $Z$ and $J$. This is where \cite{GG25} uses an injection
+into $\iota$ to get $|E|\le n$. Instead apply Lemma~\ref{lem:count} with
+$G_\gamma=\{i:u_0(i)+\gamma u_1(i)=c_0(i)+\gamma c_1(i)\}$, which has at least $n-e$ elements
+because $V(\gamma)=c_0+\gamma c_1$ is close to the line. So $|E|\le e+1<b$, a contradiction.
+
+\emph{Zero code.} Lemma~\ref{lem:count} with pencil $(0,0)$ and $G_\gamma=S_\gamma$ gives
+$|B|\le e+1$; the synthetic construction of \cite{GG25} produces $E\subseteq B$ with $|E|\ge b$.
+
+All probabilities are exact counts over a uniform $\gamma$; no union bound is used.
+\end{proof}
+
+For $n\ge2$ the hypotheses follow from $b=n+1$, so Theorem~\ref{thm:mca} contains
+\cite[Thm.~3.5]{GG25} for lines. The condition $n<q$ replaces $n+1\le q$, which $b=n+1$ implies;
+it excludes Reed--Solomon codes on the whole field. Whether $b=e+1$ suffices is open; the
+counting lemma is tight, but that does not settle the implication.
+
+\section{Boosting and folded Reed--Solomon codes}
+
+\begin{lemma}\label{lem:boost}
+Under the hypotheses of the boosting lemma of \cite{GG25} as formalized in ArkLib
+(\lean{strongLineDecodable\_boost\_of\_lambda\_le}: strong line decodability with parameters
+$(a,b)$, $b>1$, list size at most $L$ at radius $\delta b/(b-1)$, $(L+1)^2<q$), the code is
+strongly line decodable with parameters $((b'-1)L+a,\ b')$ for every target $b'$.
+\end{lemma}
+
+The existing proof is already parametric in the target: the at most $L$ globally close pairs each
+align fewer than $b'$ challenges, removing them costs at most $(b'-1)L$, and the weak property
+applied to the rest gives a contradiction. The case $b'=n+1$ is the existing statement.
+
+\begin{corollary}\label{cor:mcaboost}
+With $m=\max(\lfloor\delta n\rfloor+1,2)$, strong line decodability with parameters $(a,2t)$, list
+size at most $t$ at radius $2t\delta/(2t-1)$, $n<q$ and $(t+1)^2\le mt+a$ give
+$\mca(C,\delta)\le(mt+a)/q$. The existing bound is $(nt+a)/q$.
+\end{corollary}
+
+\begin{corollary}\label{cor:frs}
+Under the hypotheses of \cite[Cor.~4.10]{GG25} as formalized in ArkLib (\lean{frs\_mcaError\_le}:
+admissible folding with $s>4t^2$, $sn<q$, a generator $\omega$ of $\F^\times$, $t>0$),
+with $\rho=k/(sn)$ and $\delta=1-\rho-2/t$,
+\[
+\mca(C,\delta)\le\frac{(\delta n+2)t+3t^3}{q},
+\]
+and therefore $\mca(C,\delta)\le\min\bigl(nt+3t^3,\ (\delta n+2)t+3t^3\bigr)/q$. The second
+bound is smaller exactly when $(1-\delta)n>2$.
+\end{corollary}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cccccc}
+\toprule
+$\rho$ & $t$ & $\delta$ & $n$ & ratio of bounds & bits \\
+\midrule
+$1/2$ & 10 & 0.30 & $2^{20}$ & 3.33 & 1.74 \\
+$1/2$ & 20 & 0.40 & $2^{20}$ & 2.50 & 1.32 \\
+$1/2$ & 50 & 0.46 & $2^{20}$ & 2.16 & 1.11 \\
+$1/4$ & 20 & 0.65 & $2^{20}$ & 1.54 & 0.62 \\
+$1/8$ & 20 & 0.775 & $2^{20}$ & 1.29 & 0.37 \\
+\bottomrule
+\end{tabular}
+\caption{Ratio $(nt+3t^3)/((\delta n+2)t+3t^3)$ of the existing and new FRS bounds. The gain is
+close to $1/\delta$ when $nt\gg t^3$. These are upper bounds on the MCA error, not measured
+soundness of a protocol.}
+\end{table}
+
+\section{Formalization}\label{sec:lean}
+
+All statements are proved in Lean~4 (toolchain v4.35.0) against ArkLib commit \texttt{2203b01}.
+New declarations: \lean{card\_le\_floor\_add\_one\_of\_pencil\_mismatch} (Lemma~\ref{lem:count}),
+\lean{IsLineDecodable.mcaError\_le\_of\_floor\_add\_two} (Theorem~\ref{thm:mca}),
+\lean{strongLineDecodable\_boost\_of\_lambda\_le\_target} (Lemma~\ref{lem:boost}),
+\lean{mcaError\_le\_of\_strongLineDecodable\_of\_floor\_add\_two} (Corollary~\ref{cor:mcaboost}),
+\lean{frs\_mcaError\_le\_floor\_add\_two} and \lean{frs\_mcaError\_le\_min}
+(Corollary~\ref{cor:frs}). The existing theorems keep their statements; in the final version
+\lean{IsLineDecodable.mcaError\_le} and the original boosting lemma are derived from the same
+parametrised proofs. \lean{\#print axioms} for every new declaration lists only
+\lean{propext}, \lean{Classical.choice} and \lean{Quot.sound}; ArkLib's full validation script
+(\lean{validate.sh --axioms}) passes. {\color{gray}[Repository link and commit to be added at
+release.]}
+
+\section{Related work}
+
+The threshold $\ell n+1$ appears in \cite[Thm.~3.5]{GG25} and in \cite[Thm.~2.10]{LCD26}. The MCA
+bound of \cite[Thm.~2.13]{AGG26} has the form $(\ell nL+a)/|K|$; we expect the same refinement to
+apply for $\ell=1$ but have not checked it against its proof. Jeronimo, Liu and
+Rajpal~\cite{JLR26} use a related agreement count for line correlated agreement. For degree-$\ell$
+curves the counting argument gives $|E|\le\ell(e+1)$, since a mismatch coordinate is a root for at
+most $\ell$ challenges; we checked this numerically for small cases but did not formalize it.
+
+\section*{Acknowledgements and use of AI tools}
+The counting lemma follows \lean{exists\_common\_affine\_set} of the Proximity Prize submission by
+BitWonka. The formalization builds on ArkLib and its contributors. Claude (Anthropic) wrote most
+of the Lean code and the numerical checks; ChatGPT (OpenAI) reviewed the statements, quantifier
+structure and literature comparison. The author checked every statement and is responsible for
+the content; the Lean kernel checks every proof.
+
+\begin{thebibliography}{9}
+\bibitem{GG25} R.~Goyal and V.~Guruswami. Optimal proximity gaps for subspace-design codes and
+(random) Reed--Solomon codes. ECCC TR25-166 (2025, revised 2026); IACR ePrint 2025/2054.
+\bibitem{AGG26} O.~Alrabiah, R.~Goyal and V.~Guruswami. Explicit Reed--Solomon subspace designs:
+optimal list and line decoding. ECCC TR26-262; arXiv:2610.36215, October 2026.
+\bibitem{LCD26} R.~Goyal, V.~Guruswami, Y.~Sun and M.~Wootters. Locality of curve-decoding and
+improved proximity gaps. arXiv:2607.08516, 2026; APPROX/RANDOM 2026, LIPIcs vol.~392, paper~61.
+\bibitem{JLR26} F.~G.~Jeronimo, L.~Liu and P.~Rajpal. Optimal proximity gap for folded
+Reed--Solomon codes via subspace designs. arXiv:2601.10047, 2026.
+\bibitem{BW} Proximity Prize submission \texttt{016274d1-9b09-4ce1-add3-4c632dbbc283}
+(68.15 bits; listed under BitWonka on the leaderboard), \texttt{ProximityPrize/SubmissionLower} in
+\url{https://github.com/proximity-prize/proximity-prize}, commit \texttt{eb82d3b}, Apache-2.0.
+\bibitem{ArkLib} ArkLib contributors. ArkLib: a library for formally verified arguments of
+knowledge. \url{https://github.com/Verified-zkEVM/ArkLib}.
+\end{thebibliography}
+
+\end{document}

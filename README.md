@@ -1,0 +1,59 @@
+# Error-Sensitive Alignment Bounds for Affine-Line Decoding (Lean-verified)
+
+Nam Khanh Ngo · Independent Researcher, Beethoven Capital (independent research initiative) ·
+ORCID [0009-0003-6013-7308](https://orcid.org/0009-0003-6013-7308)
+
+Paper: [`paper/e2_note.pdf`](paper/e2_note.pdf).
+
+## Result
+
+Goyal–Guruswami (GG25, Thm 3.5) derive affine-line mutual correlated agreement (MCA) from
+`(δ, a, n+1)` line decodability. This work shows that `b ≥ max(⌊δn⌋ + 2, 3)` aligned challenges
+suffice when `n < |F|`, and propagates the change through the boosting step. For folded
+Reed–Solomon codes in the capacity regime (GG25, Cor 4.10), with `δ = 1 − ρ − 2/t`:
+
+    ε_mca(C, δ) ≤ ((δn + 2)·t + 3t³) / |F|      (previously (n·t + 3t³) / |F|)
+
+This is an upper bound on the MCA error; the gain is a factor of about `1/δ` on the main term.
+
+## Lean declarations (namespace `CodingTheory`)
+
+| Declaration | Content |
+|---|---|
+| `card_le_floor_add_one_of_pencil_mismatch` | counting lemma, at most `e + 1` aligned challenges |
+| `IsLineDecodable.mcaError_le_of_floor_add_two` | MCA from `(δ, a, b)` line decodability, `b ≥ max(⌊δn⌋+2, 3)`, `n < |F|` |
+| `FrsInternal.strongLineDecodable_boost_of_lambda_le_target` | boost to any target `b'` at cost `(b' − 1)·L` |
+| `mcaError_le_of_strongLineDecodable_of_floor_add_two` | composition |
+| `frs_mcaError_le_floor_add_two`, `frs_mcaError_le_min` | folded Reed–Solomon bound, and the better of old and new |
+
+The existing ArkLib theorems keep their statements; `IsLineDecodable.mcaError_le` and
+`strongLineDecodable_boost_of_lambda_le` are derived from the same parametrised proofs.
+
+## Reproduce
+
+Base: ArkLib `2203b01cede353c4cb8e6524416dbf106e2c5cfb`, Lean `v4.35.0`.
+
+```sh
+git clone https://github.com/Verified-zkEVM/ArkLib.git && cd ArkLib
+git checkout 2203b01cede353c4cb8e6524416dbf106e2c5cfb
+git apply ../e2.patch            # or copy ArkLib/ from this repository over the checkout
+lake exe cache get
+lake build ArkLib.Data.CodingTheory.ProximityGap.CapacityBounds.Frs
+lake env lean ../AxiomCheck.lean # every declaration: propext, Classical.choice, Quot.sound
+./scripts/validate.sh --axioms   # full ArkLib validation
+```
+
+## Provenance and credit
+
+- The four files under `ArkLib/` are modified copies of ArkLib files (Apache-2.0, © ArkLib
+  Contributors). Changes are listed in `e2.patch`.
+- The counting lemma follows `exists_common_affine_set` of Proximity Prize submission
+  `016274d1-9b09-4ce1-add3-4c632dbbc283` (68.15 bits, listed under BitWonka on the leaderboard),
+  `ProximityPrize/SubmissionLower` in github.com/proximity-prize/proximity-prize, Apache-2.0.
+- AI assistance: Claude (Anthropic) wrote most of the Lean code and numerical checks; ChatGPT
+  (OpenAI) reviewed statements and literature. The author is responsible for the content; the
+  Lean kernel checks every proof.
+
+## License
+
+Apache-2.0 (see `LICENSE`).

@@ -1,0 +1,8 @@
+This repository contains modified versions of files from ArkLib
+(https://github.com/Verified-zkEVM/ArkLib), Copyright (c) 2026 ArkLib Contributors,
+licensed under the Apache License, Version 2.0. Modifications by Nam Khanh Ngo, 2026:
+see e2.patch for the full list of changes.
+
+The counting argument follows exists_common_affine_set in the Proximity Prize submission
+016274d1-9b09-4ce1-add3-4c632dbbc283 (https://github.com/proximity-prize/proximity-prize),
+licensed under the Apache License, Version 2.0.
